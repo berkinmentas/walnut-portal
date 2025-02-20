@@ -23,9 +23,7 @@ class CallbackLogController extends Controller
 
         return DataTables::eloquent($model)
             ->addColumn('actions', function(CallbackLog $callbackLog) {
-                $action = '<a class="btn btn-outline-primary btn-sm btn-action me-3" href="'.route('admin.callback-logs.show', ['callbackLog' => $callbackLog]).'">'.__('Görüntüle').'</a>';
-
-                return $action;
+                return '<a class="btn btn-outline-primary btn-sm btn-action me-3" href="'.route('admin.callbackLogs.show', ['callbackLog' => $callbackLog]).'">'.__('Görüntüle').'</a>';
             })
             ->rawColumns(['id', 'incoming_log_id', 'status', 'actions'])
             ->make();
@@ -49,11 +47,11 @@ class CallbackLogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CallbackLog $log)
+    public function show(CallbackLog $callbackLog)
     {
-        $log->load('incomingLog.incomingLogData');
+        $callbackLog->load('incomingLog');
         return view('admin.callback-logs.show', [
-            'log' => $log,
+            'callbackLog' => $callbackLog,
         ]);
     }
 

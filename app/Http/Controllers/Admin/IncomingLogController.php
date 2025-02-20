@@ -18,18 +18,25 @@ class IncomingLogController extends Controller
         return view('admin.incoming-logs.index');
     }
 
-    public function datatable() {
+    public function datatable(Request $request) {
 
         $model = IncomingLog::query();
 
-        return DataTables::eloquent($model)
-            ->addColumn('actions', function(IncomingLog $incomingLog) {
-                $action = '<a class="btn btn-outline-primary btn-sm btn-action me-3" href="'.route('admin.incomingLogs.edit', ['incomingLog' => $incomingLog]).'">'.__('Görüntüle').'</a>';
-                $action .= '<a data-id="' . $incomingLog->id . '" data-url="' . route('admin.incomingLogs.destroy', ['incomingLog' => $incomingLog]) . '" role="button" class="btn btn-outline-danger btn-sm btn-delete">'.__('Sil').'</a>';
+        if ($request->has('startDate') && $request->startDate && $request->has('endDate') && $request->endDate) {
+            $model->whereBetween('created_at', [
+                $request->startDate . ' 00:00:00',
+                $request->endDate . ' 23:59:59'
+            ]);
+        }
 
-                return $action;
+        return DataTables::eloquent($model)
+            ->editColumn('created_at', function ($incomingLog) {
+              return date('d-m-Y', strtotime($incomingLog->created_at));
             })
-            ->rawColumns(['id', 'title', 'word_count', 'actions'])
+            ->addColumn('actions', function(IncomingLog $incomingLog) {
+                return '<a class="btn btn-outline-primary btn-sm btn-action me-3" href="'.route('admin.incomingLogs.show', ['incomingLog' => $incomingLog]).'">'.__('Görüntüle').'</a>';
+            })
+            ->rawColumns(['id', 'title', 'word_count', 'created_at', 'actions'])
             ->make();
     }
     /**
@@ -51,11 +58,11 @@ class IncomingLogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(IncomingLog $log)
+    public function show(IncomingLog $incomingLog)
     {
-        $log->load('incomingLogData', 'callbackLogs');
+        $incomingLog->load('incomingLogData');
         return view('admin.incoming-logs.show', [
-            'log' => $log,
+            'incomingLog' => $incomingLog,
         ]);
     }
 

@@ -16,24 +16,16 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.incoming-logs.*') ? 'active' : '' }}"
-                   href="{{ route('admin.incoming-logs.index') }}">
+                <a class="nav-link {{ request()->routeIs('admin.incomingLogs.*') ? 'active' : '' }}"
+                   href="{{ route('admin.incomingLogs.index') }}">
                     <i class="fa-solid fa-file-lines"></i>
                     <span>{{ __('Incoming Logs') }}</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('admin.incoming-log-data.*') ? 'active' : '' }}"
-                   href="{{ route('admin.incoming-log-data.index') }}">
-                    <i class="fa-solid fa-database"></i>
-                    <span>{{ __('Incoming Log Data') }}</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('callback-logs.*') ? 'active' : '' }}"
-                   href="{{ route('admin.callback-logs.index') }}">
+                <a class="nav-link {{ request()->routeIs('callbackLogs.*') ? 'active' : '' }}"
+                   href="{{ route('admin.callbackLogs.index') }}">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span>{{ __('Callback Log') }}</span>
                 </a>

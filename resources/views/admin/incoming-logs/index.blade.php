@@ -7,11 +7,24 @@
                 <h5 class="mb-0">Incoming Logs</h5>
             </div>
             <div class="card-body">
+                <div class="row d-flex justify-content-end mb-3">
+                    <div class="col-md-3">
+                        <input type="date" id="startDate" class="form-control datepicker" placeholder="Start Date">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" id="endDate" class="form-control datepicker" placeholder="End Date">
+                    </div>
+                    <div class="col-md-2">
+                        <button id="filterBtn" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </div>
+
                 <table class="table table-datatable w-100">
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Email</th>
+                        <th>Title</th>
+                        <th>Word Count</th>
                         <th>Created At</th>
                         <th>Actions</th>
                     </tr>
@@ -25,38 +38,47 @@
     @push('js-stack')
         <script>
             window.addEventListener('DOMContentLoaded', function () {
+                // DataTable başlat
                 let tableList = window.tableList = $('.table-datatable').DataTable({
                     processing: true,
                     serverSide: true,
                     lengthChange: false,
                     ajax: {
-                        url: '{{ route('admin.incomingLogs.datatable') }}',
+                        url: '{{ route('admin.incoming-logs.datatable') }}',
                         type: 'POST',
-                        data: function () {
+                        data: function (d) {
+                            d.title = $('#searchTitle').val();
+                            d.startDate = $('#startDate').val();
+                            d.endDate = $('#endDate').val();
                         },
                     },
-                    order: [[0, "asc"]],
+                    order: [[3, "desc"]],
                     pageLength: 15,
                     columns: [
                         {"data": "id"},
-                        {"data": "incoming_log_id"},
-                        {"data": "status"},
-                        {"data": "actions"}
+                        {"data": "title"},
+                        {"data": "word_count"},
+                        {"data": "created_at"},
+                        {"data": "actions", orderable: false, searchable: false}
                     ],
-                    columnDefs: [
-                        {targets: 'no-sort', orderable: false},
-                        {searchable: false, targets: [0, 1]}
-                    ]
                 });
 
-                tableList.on('preXhr', function (evt, settings) {
-                    if (settings.jqXHR) {
-                        settings.jqXHR.abort();
-                    }
+                // Filtreleme butonuna tıklanınca DataTable'ı yenile
+                $('#filterBtn').click(function () {
+                    tableList.ajax.reload();
                 });
-                document.querySelector('.datatable-search').addEventListener('keyup', _.debounce(function (e) {
-                    tableList.search(this.value).draw();
-                }, 300));
+
+                // Tarih seçicileri başlat
+                $('.datepicker').datepicker({
+                    format: 'yyyy-mm-dd',
+                    autoclose: true,
+                    todayHighlight: true
+                });
+
+                // Arama kutusu için debounce ekle
+                $('#searchTitle').keyup(_.debounce(function () {
+                    tableList.ajax.reload();
+                }, 500));
             });
         </script>
     @endpush

@@ -13,6 +13,7 @@
                         <th>#</th>
                         <th>Callback Log</th>
                         <th>Status</th>
+                        <th>Result</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -30,7 +31,7 @@
                     serverSide: true,
                     lengthChange: false,
                     ajax: {
-                        url: '{{ route('admin.callbackLogs.datatable') }}',
+                        url: '{{ route('admin.callback-logs.datatable') }}',
                         type: 'POST',
                         data: function () {
                         },
@@ -41,6 +42,7 @@
                         {"data": "id"},
                         {"data": "incoming_log_id"},
                         {"data": "status"},
+                        {"data": "result"},
                         {"data": "actions"}
                     ],
                     columnDefs: [
