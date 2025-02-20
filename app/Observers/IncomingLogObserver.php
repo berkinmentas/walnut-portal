@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendTestReceiverRequest;
 use App\Models\CallbackLog;
 use App\Models\IncomingLog;
 use Illuminate\Support\Facades\DB;
@@ -12,29 +13,10 @@ class IncomingLogObserver
     /**
      * Handle the IncomingLog "created" event.
      */
+
     public function created(IncomingLog $incomingLog)
     {
-        DB::transaction(function () use ($incomingLog) {
-            try {
-                $response = Http::post('/test-reciever', [
-                    'title' => $incomingLog->title,
-                    'word_count' => $incomingLog->word_count
-                ]);
-
-                CallbackLog::query()->create([
-                    'incoming_log_id' => $incomingLog->id,
-                    'status' => $response->json('ok') ? 'confirmed' : 'pending',
-                    'result' => json_encode($response->json())
-                ]);
-
-            } catch (\Exception $e) {
-                CallbackLog::query()->create([
-                    'incoming_log_id' => $incomingLog->id,
-                    'status' => 'pending',
-                    'result' => $e->getMessage()
-                ]);
-            }
-        });
+        dispatch(new SendTestReceiverRequest($incomingLog));
     }
 
     /**

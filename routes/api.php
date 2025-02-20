@@ -22,5 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('api.key')->group(function () {
     Route::post('/callback', [ApiController::class, 'callback']);
-    Route::post('/test-reciever', [ApiController::class, 'testReceiver']);
+    Route::post('/test-receiver', [ApiController::class, 'testReceiver'])->name('test-receiver');
 });

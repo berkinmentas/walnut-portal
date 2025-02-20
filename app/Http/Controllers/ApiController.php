@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CallbackLog;
+use App\Http\Requests\Api\CallbackRequest;
 use App\Models\IncomingLog;
 use App\Models\IncomingLogData;
 use Illuminate\Http\Request;
@@ -11,27 +11,24 @@ use Illuminate\Validation\ValidationException;
 
 class ApiController extends Controller
 {
-    public function callback(Request $request)
+    public function callback(CallbackRequest $request)
     {
         if (!is_array($request->all())) {
             throw ValidationException::withMessages(['error' => 'Geçersiz veri formatı. Dizi bekleniyor.']);
         }
 
-        $validated = $request->validate([
-            '*.source' => 'required|string',
-            '*.title' => 'required|string',
-            '*.word_count' => 'required|integer'
-        ]);
+        $req = $request->validated();
+
 
         DB::beginTransaction();
         try {
             $logData = IncomingLogData::query()->create([
-                'payload' => $validated,
+                'payload' => $req,
                 'inserted' => []
             ]);
 
             $insertedNews = [];
-            foreach ($validated as $news) {
+            foreach ($req as $news) {
 
                 $exists = IncomingLog::query()
                     ->where('title', $news['title'])
