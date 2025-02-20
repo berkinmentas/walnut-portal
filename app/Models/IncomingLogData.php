@@ -10,6 +10,7 @@ class IncomingLogData extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'incoming_log_datas';
     protected $fillable = [
         'payload',
         'inserted'

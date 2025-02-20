@@ -10,6 +10,7 @@ class IncomingLog extends Model
 {
     use HasFactory, SoftDeletes;
 
+
     protected $fillable = [
         'source',
         'title',
