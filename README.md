@@ -1,74 +1,158 @@
-# Proje Hakkında
+# News Dashboard
 
-Bu proje, Laravel 10 tabanlı bir web uygulamasıdır.
+A web-based dashboard built with Laravel 10 for managing and displaying news articles.
 
-## Kullanılan Teknolojiler
+## Technologies Used
+- **Laravel 10**: PHP web application framework
+- **PHP 8.3**: Server-side scripting language
+- **Vite**: Modern frontend build tool
+- **Bootstrap**: CSS framework
+- **jQuery**: JavaScript library
+- **SweetAlert2**: Alert library
 
-- **Laravel**: PHP tabanlı bir web uygulama çatısı.
-- **Vite**: Hızlı ve modern bir geliştirme sunucusu.
-- **Bootstrap**: CSS tabanlı bir stil kütüphanesi.
-- **jQuery**: JavaScript kütüphanesi.
-- **SweetAlert2**: Uyarı mesajları oluşturmak için kullanılan bir kütüphane.
+## Requirements
+- PHP 8.3 or higher
+- Node.js and npm
+- Composer
+- Docker and Docker Compose (for deployment)
 
-## Gereksinimler
+## Local Development Setup
 
-- **PHP**: 8.1 veya üstü
-- **Node.js** ve **npm**
-- **Composer**
-
-## Kurulum Adımları
-
-1. Projeyi GitHub'dan klonlayın:
+1. Clone the repository:
    ```bash
    git clone <repository-url>
    cd <repository-directory>
    ```
 
-2. PHP bağımlılıklarını yükleyin:
+2. Install PHP dependencies:
    ```bash
    composer install
    ```
 
-3. Node.js bağımlılıklarını yükleyin:
+3. Install Node.js dependencies:
    ```bash
    npm install
    ```
 
-4. Çevresel değişken dosyasını ayarlayın:
+4. Set up environment variables:
    ```bash
    cp .env.example .env
    ```
-   `.env` dosyasını açın ve gerekli yapılandırmaları yapın.
+   Configure the `.env` file with your settings.
 
-5. Laravel uygulamasını başlatın:
+5. Generate application key:
+   ```bash
+   php artisan key:generate
+   ```
+
+6. Run migrations:
+   ```bash
+   php artisan migrate
+   ```
+
+7. Start the development server:
    ```bash
    php artisan serve --host=0.0.0.0 --port=8000
    ```
 
-## Geliştirme Sunucusunu Başlatma
+8. In a separate terminal, start Vite:
+   ```bash
+   npm run dev
+   ```
 
-Vite geliştirme sunucusunu başlatmak için:
-```bash
-npm run dev
+## API Authentication
+
+The API uses key-based authentication. Include the `X-API-KEY` header in your requests:
+
+```http
+X-API-KEY: your_api_key_here
 ```
 
-## API İstekleri
+Configure your API key in the `.env` file:
+```env
+API_KEY=your_api_key_here
+```
 
-API istekleri için Laravel'in sağladığı `php artisan serve` komutunu kullanarak sunucuyu çalıştırın.
+## AWS EC2 Deployment
 
-## API Anahtarı Kontrolü
+### Prerequisites
+- AWS EC2 instance running Ubuntu 22.04 LTS
+- Domain name (optional)
 
-API istekleri için `X-API-KEY` başlığı kullanılmaktadır. Bu anahtar, isteklerin doğrulanması için gereklidir ve middleware tarafından kontrol edilir. Aşağıdaki adımları izleyerek API anahtarınızı ayarlayabilirsiniz:
+### Deployment Steps
 
-1. `.env` dosyanızda `API_KEY` değişkenini tanımlayın ve değerini ayarlayın:
-   ```env
-   API_KEY=your_api_key_here
+1. Connect to your EC2 instance:
+   ```bash
+   ssh -i your-key.pem ubuntu@your-ec2-ip
    ```
 
-2. API isteklerinizi yaparken `X-API-KEY` başlığını ekleyin:
-   ```http
-   X-API-KEY: your_api_key_here
+2. Install required software:
+   ```bash
+   # Update system
+   sudo apt update && sudo apt upgrade -y
+
+   # Install Docker and Docker Compose
+   sudo apt install docker.io docker-compose -y
+   sudo systemctl enable docker
+   sudo usermod -aG docker ubuntu
    ```
 
-Middleware, gelen isteklerdeki `X-API-KEY` başlığını kontrol eder ve `.env` dosyasındaki `API_KEY` ile eşleşip eşleşmediğini doğrular. Eşleşme sağlanmazsa, istek reddedilir.
+3. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
 
+4. Create environment file:
+   ```bash
+   cp .env.example .env
+   # Edit .env with production settings
+   ```
+
+5. Build and start the containers:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+6. Set up Laravel application:
+   ```bash
+   docker-compose exec app php artisan key:generate
+   docker-compose exec app php artisan migrate
+   docker-compose exec app php artisan storage:link
+   ```
+
+7. Set proper permissions:
+   ```bash
+   sudo chown -R www-data:www-data storage bootstrap/cache
+   ```
+
+### SSL Configuration (Optional)
+
+1. Install Certbot:
+   ```bash
+   sudo apt install certbot python3-certbot-nginx -y
+   ```
+
+2. Obtain SSL certificate:
+   ```bash
+   sudo certbot --nginx -d yourdomain.com
+   ```
+
+### Maintenance
+
+- View logs:
+  ```bash
+  docker-compose logs -f
+  ```
+
+- Restart services:
+  ```bash
+  docker-compose restart
+  ```
+
+- Update application:
+  ```bash
+  git pull
+  docker-compose up -d --build
+  docker-compose exec app php artisan migrate
+  ```
